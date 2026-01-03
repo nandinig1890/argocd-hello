@@ -3,7 +3,7 @@ name: Deploy to EKS via ArgoCD
 on:
   push:
     branches:
-      - main  # push trigger branch
+      - main  # Trigger on push to main
 
 jobs:
   deploy:
@@ -34,7 +34,7 @@ jobs:
         run: |
           aws eks update-kubeconfig --name testcluster --region ${{ secrets.AWS_REGION }}
 
-      # 5️⃣ Apply your Kubernetes manifests
+      # 5️⃣ Apply Kubernetes manifests (optional if you want ArgoCD to manage)
       - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f manifests/
@@ -46,7 +46,7 @@ jobs:
           chmod +x argocd
           sudo mv argocd /usr/local/bin/
 
-      # 7️⃣ Login to Argo CD
+      # 7️⃣ Login to Argo CD (ignore self-signed cert)
       - name: Argo CD Login
         run: |
           argocd login ${{ secrets.ARGOCD_SERVER }} \
@@ -54,7 +54,7 @@ jobs:
             --password ${{ secrets.ARGOCD_PASSWORD }} \
             --insecure
 
-      # 8️⃣ Sync your application in Argo CD
+      # 8️⃣ Sync your application
       - name: Argo CD Sync
         run: |
           argocd app sync hello-app
